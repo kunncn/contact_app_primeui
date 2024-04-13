@@ -29,7 +29,7 @@ const LoginPage = () => {
 
   const show = () => {
     toast.current?.show({
-      life: 4000,
+      life: 4500,
       severity: "error",
       summary: "Rejected",
       detail: (status?.data?.message as string) || "Something went wrong",
