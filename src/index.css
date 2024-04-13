@@ -1,0 +1,29 @@
+@layer tailwind-base, primereact, tailwind-utilities;
+
+@import "primeicons/primeicons.css";
+
+/* IMPORTANT: In "styled" mode you must add the PrimeReact Theme here. Do NOT include in "unstyled" mode */
+@import 'primereact/resources/themes/lara-light-blue/theme.css\\' layer(primereact);
+
+@layer tailwind-base {
+    @tailwind base;
+}
+
+@layer tailwind-utilities {
+    @tailwind components;
+    @tailwind utilities;
+}
+
+@layer components {
+    .box-shadow-none {
+        @apply focus:shadow-none focus:border;
+    }
+
+    .btn {
+        @apply px-5 py-3 w-full flex justify-center items-center mt-8 font-bold box-shadow-none tracking-wider
+    }
+
+    .text-primary {
+        @apply text-[#3b82f6]
+    }
+}
