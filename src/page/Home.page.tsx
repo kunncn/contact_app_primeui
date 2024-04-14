@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const HomePage = () => {
   const nav = useNavigate();
   useEffect(() => {
+    localStorage.setItem("logout", "false");
     if (localStorage.getItem("logout") === "true") {
       nav("/login");
     }
@@ -12,7 +13,7 @@ const HomePage = () => {
   return (
     <RedirectFunction
       to="/register"
-      check={!localStorage.getItem("token") && !localStorage.getItem("logout")}
+      check={!localStorage.getItem("auth") && !localStorage.getItem("logout")}
     >
       <div>HomePage</div>
     </RedirectFunction>

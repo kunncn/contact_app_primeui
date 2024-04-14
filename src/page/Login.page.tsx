@@ -1,11 +1,15 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { ContainerComponent, InputComponent } from "../component/ui";
+import {
+  ContainerComponent,
+  InputComponent,
+  ToastComponent,
+} from "../component/ui";
 import { Button } from "primereact/button";
 import { useContactLogInMutation } from "../service/contact/endpoint/auth.endpoint";
-import { Toast } from "primereact/toast";
-import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useToastHook } from "../hook";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -18,23 +22,23 @@ const validationSchema = Yup.object().shape({
 
 const LoginPage = () => {
   const [mutate, status] = useContactLogInMutation();
-  const toast = useRef<Toast>(null);
-  const toastBtnRef = useRef<HTMLButtonElement>(null);
+  const { errorToastHandler, successToastHandler, errorToast, successToast } =
+    useToastHook();
+  const nav = useNavigate();
 
   useEffect(() => {
     if (status?.data?.success === false) {
-      toastBtnRef?.current?.click();
+      console.log(status?.data?.message);
+      errorToastHandler({ message: status?.data?.message });
+    } else if (status?.data?.success === true) {
+      console.log(status?.data);
+      successToastHandler(status?.data?.message);
+      setTimeout(() => {
+        localStorage.setItem("auth", status?.data?.token);
+        nav("/");
+      }, 2000);
     }
-  }, [status]);
-
-  const show = () => {
-    toast.current?.show({
-      life: 4500,
-      severity: "error",
-      summary: "Rejected",
-      detail: (status?.data?.message as string) || "Something went wrong",
-    });
-  };
+  }, [status, nav]);
 
   const formik = useFormik({
     validateOnBlur: true,
@@ -62,9 +66,9 @@ const LoginPage = () => {
       ]}
     >
       <div className="border border-gray-200 flex-grow p-8 max-w-[500px]">
-        <Toast ref={toast} position="top-center" />
-        {/* below btn is only for toast alert */}
-        <Button className="btn w-fit hidden" ref={toastBtnRef} onClick={show} />
+        <ToastComponent
+          toast={!status?.data?.success ? errorToast : successToast}
+        />
 
         <div className="flex justify-between items-center  mb-8">
           <h1 className="text-2xl font-bold text-left ">Login Page</h1>

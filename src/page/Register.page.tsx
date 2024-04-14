@@ -1,11 +1,15 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { ContainerComponent, InputComponent } from "../component/ui";
+import {
+  ContainerComponent,
+  InputComponent,
+  ToastComponent,
+} from "../component/ui";
 import { Button } from "primereact/button";
 import { useContactRegisterMutation } from "../service/contact/endpoint/auth.endpoint";
-import { Toast } from "primereact/toast";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useToastHook } from "../hook";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -24,42 +28,20 @@ const validationSchema = Yup.object().shape({
 
 const RegisterPage = () => {
   const [mutate, status] = useContactRegisterMutation();
-  const errorToast = useRef<Toast>(null);
-  const errorToastBtnRef = useRef<HTMLButtonElement>(null);
-  const successToast = useRef<Toast>(null);
-  const successToastBtnRef = useRef<HTMLButtonElement>(null);
   const nav = useNavigate();
+  const { errorToast, errorToastHandler, successToast, successToastHandler } =
+    useToastHook();
 
   useEffect(() => {
     if (status.isError) {
-      errorToastBtnRef?.current?.click();
+      errorToastHandler({ message: status?.error?.data?.message });
     } else if (status.isSuccess) {
-      console.log(status.data.message);
-      successToastBtnRef?.current?.click();
+      successToastHandler(status?.data?.message);
       setTimeout(() => {
         nav("/login");
       }, 2000);
     }
-  }, [status]);
-
-  const errorToastHandler = () => {
-    errorToast.current?.show({
-      life: 4500,
-      severity: "error",
-      summary: "Rejected",
-      detail:
-        (status?.error?.data?.message as string) || "Something went wrong",
-    });
-  };
-
-  const successToastHandler = () => {
-    successToast.current?.show({
-      life: 1500,
-      severity: "success",
-      summary: "Success",
-      detail: (status?.data?.message as string) || "Register Successfully",
-    });
-  };
+  }, [nav, status]);
 
   const formik = useFormik({
     validateOnBlur: true,
@@ -89,21 +71,7 @@ const RegisterPage = () => {
       ]}
     >
       <div className="border border-gray-200 flex-grow p-8 max-w-[500px]">
-        <Toast ref={errorToast} position="top-center" />
-        {/* below btn is only for error toast alert */}
-        <Button
-          className="btn w-fit hidden"
-          ref={errorToastBtnRef}
-          onClick={errorToastHandler}
-        />
-
-        <Toast ref={successToast} position="top-center" />
-        {/* below btn is only for success toast alert */}
-        <Button
-          className="btn w-fit hidden"
-          ref={successToastBtnRef}
-          onClick={successToastHandler}
-        />
+        <ToastComponent toast={status.isError ? errorToast : successToast} />
 
         <div className="flex justify-between items-center  mb-8">
           <h1 className="text-2xl font-bold text-left ">Register Page</h1>
