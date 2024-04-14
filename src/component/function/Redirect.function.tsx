@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 type Props = {
   children: React.ReactNode;
   to: string;
-  check: boolean;
+  check: string | boolean | null;
 };
 
 const RedirectFunction = ({ to, check, children }: Props) => {
