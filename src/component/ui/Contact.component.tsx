@@ -1,10 +1,11 @@
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
 import { RedirectFunction } from "../function";
 import { useToastHook } from "../../hook";
 import ToastComponent from "./Toast.component";
+import { useDeleteContactMutation } from "../../service/contact/endpoint/contact.endpoint";
+import { useState, useEffect } from "react";
 
 type Props = {
   address: null | string;
@@ -20,26 +21,34 @@ type Props = {
 
 const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
   const { successToast, successToastHandler } = useToastHook();
-  const nav = useNavigate();
-  useToastHook();
+  const [deleteContactMutate, deleteContactStatus] = useDeleteContactMutation();
+  const [deletingContactId, setDeletingContactId] = useState<number | null>(
+    null
+  );
 
   const handleEdit = (id: number) => {};
 
-  const handleDelete = (id: number) => {};
-
-  const logoutHandler = () => {
-    localStorage.setItem("logout", true.toString());
-    localStorage.removeItem("auth");
-    successToastHandler({ message: "Logged out successfully" });
-    setTimeout(() => {
-      nav("/login");
-    }, 2000);
+  const handleDelete = async (id: number) => {
+    setDeletingContactId(id);
+    await deleteContactMutate(id);
   };
 
+  useEffect(() => {
+    if (deleteContactStatus.isSuccess) {
+      successToastHandler({
+        message: "Contact Deleted",
+      });
+      setDeletingContactId(null);
+    }
+  }, [deleteContactStatus.isSuccess]);
+
   const renderActions = (id: number) => {
+    const isDeleting = id === deletingContactId;
+
     return (
       <div className="flex gap-1 justify-end pe-7">
         <Button
+          disabled={isDeleting}
           type="button"
           className="p-2 rounded btn w-fit mt-0"
           onClick={() => handleEdit(id)}
@@ -47,6 +56,7 @@ const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
           <i className="pi pi-pencil text-white text-xl"></i>
         </Button>
         <Button
+          disabled={isDeleting}
           type="button"
           className="p-2 rounded btn w-fit mt-0"
           onClick={() => handleDelete(id)}
@@ -105,9 +115,6 @@ const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
             header="Action"
           />
         </DataTable>
-        <Button onClick={logoutHandler} className="btn w-fit ms-auto">
-          LogOut
-        </Button>
       </div>
     </RedirectFunction>
   );

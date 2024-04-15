@@ -17,9 +17,19 @@ const contactEndPoint = contactApi.injectEndpoints({
       }),
       invalidatesTags: ["contacts"],
     }),
+    deleteContact: build.mutation({
+      query: (id) => ({
+        url: "contact/" + id,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["contacts"],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetContactsQuery, useCreateContactMutation } =
-  contactEndPoint;
+export const {
+  useGetContactsQuery,
+  useCreateContactMutation,
+  useDeleteContactMutation,
+} = contactEndPoint;

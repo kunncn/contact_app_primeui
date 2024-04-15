@@ -32,10 +32,10 @@ const FormComponent = ({
     if (createContactStatus.isError) {
       errorToastHandler({ message: createContactStatus?.error?.data?.message });
     } else if (createContactStatus.isSuccess) {
-      successToastHandler({ message: createContactStatus?.data?.message });
       setTimeout(() => {
         setVisible(false);
-      }, 2000);
+      }, 1000);
+      successToastHandler({ message: createContactStatus?.data?.message });
     }
   }, [createContactStatus]);
 
