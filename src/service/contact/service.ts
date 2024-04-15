@@ -10,5 +10,6 @@ export const contactApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ["contacts"],
   endpoints: () => ({}),
 });

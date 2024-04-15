@@ -5,3 +5,4 @@ export { default as NavBarComponent } from "./NavBar.component";
 export { default as SideBarComponent } from "./SideBar.component";
 export { default as NoContactListComponent } from "./NoContactList.component";
 export { default as ContactComponent } from "./Contact.component";
+export { default as FormComponent } from "./Form.component";

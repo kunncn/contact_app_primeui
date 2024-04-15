@@ -2,9 +2,9 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import ToastComponent from "./Toast.component";
-import { useToastHook } from "../../hook";
 import { RedirectFunction } from "../function";
+import { useToastHook } from "../../hook";
+import ToastComponent from "./Toast.component";
 
 type Props = {
   address: null | string;
@@ -19,8 +19,9 @@ type Props = {
 };
 
 const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
-  const nav = useNavigate();
   const { successToast, successToastHandler } = useToastHook();
+  const nav = useNavigate();
+  useToastHook();
 
   const handleEdit = (id: number) => {};
 
@@ -28,6 +29,7 @@ const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
 
   const logoutHandler = () => {
     localStorage.setItem("logout", true.toString());
+    localStorage.removeItem("auth");
     successToastHandler({ message: "Logged out successfully" });
     setTimeout(() => {
       nav("/login");
@@ -55,7 +57,8 @@ const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
     );
   };
 
-  const keysToRender = ["name", "phone", "email"];
+  const keysToRender = ["name", "phone", "email", "address"];
+  const reversedContactLists = contactLists.slice().reverse();
 
   return (
     <RedirectFunction
@@ -69,7 +72,7 @@ const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
         <ToastComponent toast={successToast} />
         <DataTable
           className="border border-gray-300"
-          value={contactLists}
+          value={reversedContactLists}
           paginator
           rows={4}
           rowsPerPageOptions={[4, 8, 12, 16]}
@@ -79,7 +82,17 @@ const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
               key={index}
               field={key}
               header={key.charAt(0).toUpperCase() + key.slice(1)}
-              style={{ width: "25%" }}
+              style={{ minWidth: "200px" }}
+              body={(rowData: Props) => {
+                if (
+                  (key === "email" && !rowData.email) ||
+                  (key === "address" && !rowData.address)
+                ) {
+                  return <i className="pi pi-cloud-upload"></i>;
+                } else {
+                  return rowData[key];
+                }
+              }}
             />
           ))}
           <Column

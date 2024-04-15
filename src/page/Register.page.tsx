@@ -29,6 +29,7 @@ const validationSchema = Yup.object().shape({
 
 const RegisterPage = () => {
   const [mutate, status] = useContactRegisterMutation();
+
   const nav = useNavigate();
   const { errorToast, errorToastHandler, successToast, successToastHandler } =
     useToastHook();

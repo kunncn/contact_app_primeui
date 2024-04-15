@@ -13,7 +13,7 @@ import { BarLoader } from "react-spinners";
 
 const HomePage = () => {
   const nav = useNavigate();
-  const contactStatus = useGetContactsQuery("");
+  const contactStatus = useGetContactsQuery();
   const contactLists = contactStatus?.data?.contacts?.data;
 
   useEffect(() => {

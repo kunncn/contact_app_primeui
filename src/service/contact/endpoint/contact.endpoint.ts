@@ -7,9 +7,19 @@ const contactEndPoint = contactApi.injectEndpoints({
         url: "contact",
         method: "GET",
       }),
+      providesTags: ["contacts"],
+    }),
+    createContact: build.mutation({
+      query: (data) => ({
+        url: "contact",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["contacts"],
     }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetContactsQuery } = contactEndPoint;
+export const { useGetContactsQuery, useCreateContactMutation } =
+  contactEndPoint;
