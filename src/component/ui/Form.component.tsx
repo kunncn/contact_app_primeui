@@ -2,7 +2,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { InputComponent, ToastComponent } from "../../component/ui/";
 import { Button } from "primereact/button";
-import { Dispatch, SetStateAction, useEffect } from "react";
 import { useCreateContactMutation } from "../../service/contact/endpoint/contact.endpoint";
 import { useToastHook } from "../../hook";
 
@@ -19,25 +18,11 @@ const validationSchema = Yup.object().shape({
     ),
   address: Yup.string(),
 });
-const FormComponent = ({
-  setVisible,
-}: {
-  setVisible: Dispatch<SetStateAction<boolean>>;
-}) => {
+
+const FormComponent = ({ setVisible, formData }) => {
   const { errorToast, successToast, errorToastHandler, successToastHandler } =
     useToastHook();
   const [createContactMutate, createContactStatus] = useCreateContactMutation();
-
-  useEffect(() => {
-    if (createContactStatus.isError) {
-      errorToastHandler({ message: createContactStatus?.error?.data?.message });
-    } else if (createContactStatus.isSuccess) {
-      setTimeout(() => {
-        setVisible(false);
-      }, 1000);
-      successToastHandler({ message: createContactStatus?.data?.message });
-    }
-  }, [createContactStatus]);
 
   const formik = useFormik({
     validateOnBlur: true,
@@ -50,38 +35,40 @@ const FormComponent = ({
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      await createContactMutate(values);
+      try {
+        await createContactMutate(values);
+        setTimeout(() => {
+          setVisible(false);
+        }, 1000);
+        successToastHandler({ message: createContactStatus?.data?.message });
+      } catch (error) {
+        console.log(error);
+        errorToastHandler({ message: createContactStatus?.data?.message });
+      }
     },
   });
+
   return (
     <>
       <ToastComponent
-        toast={!createContactStatus?.data?.success ? errorToast : successToast}
+        toast={!createContactStatus?.data?.success ? successToast : errorToast}
       />
       <form onSubmit={formik.handleSubmit}>
         {[
           { type: "text", name: "name", label: "Name" },
           { type: "tel", name: "phone", label: "Phone" },
           { type: "email", name: "email", label: "Email" },
-          {
-            type: "text",
-            name: "address",
-            label: "address",
-          },
+          { type: "text", name: "address", label: "Address" },
         ].map((input, index) => (
           <InputComponent
             inputDisabled={formik.isSubmitting}
             key={index}
-            value={
-              formik.values[
-                input.name as "name" | "phone" | "email" | "address"
-              ]
-            }
+            value={formik.values[input.name]}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             type={input.type}
             name={input.name}
-            errors={formik.errors[input.name as keyof typeof formik.values]}
+            errors={formik.errors[input.name]}
           />
         ))}
         <Button
