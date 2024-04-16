@@ -51,7 +51,6 @@ const HomePage = () => {
             {contactLists.length ? (
               <ContactComponent
                 setVisible={setVisible}
-                formData={formData}
                 setFormData={setFormData}
                 contactLists={contactLists}
               />

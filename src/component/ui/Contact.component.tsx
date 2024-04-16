@@ -5,27 +5,36 @@ import { RedirectFunction } from "../function";
 import { useToastHook } from "../../hook";
 import ToastComponent from "./Toast.component";
 import { useDeleteContactMutation } from "../../service/contact/endpoint/contact.endpoint";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 
 type Props = {
-  address: null | string;
-  created_at: string;
+  address: string | null;
+  created_at?: string;
   email: null | string;
   id: number;
   name: string;
   phone: string;
-  photo: null | string;
-  updated_at: string;
-  user_id: string;
+  photo?: null | string;
+  updated_at?: string;
+  user_id?: string;
+  [key: string]: string | number | null | undefined;
 };
 
 const ContactComponent = ({
   setVisible,
   contactLists,
   setFormData,
-  formData,
 }: {
   contactLists: Props[];
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  setFormData: Dispatch<
+    SetStateAction<{
+      name: string;
+      email: string;
+      phone: string;
+      address: string;
+    }>
+  >;
 }) => {
   const { successToast, successToastHandler } = useToastHook();
   const [deleteContactMutate, deleteContactStatus] = useDeleteContactMutation();
@@ -35,14 +44,22 @@ const ContactComponent = ({
 
   const handleEdit = async (id: number) => {
     const editContact = contactLists.find((contact) => contact.id === id);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      name: editContact?.name,
-      email: editContact?.email,
-      phone: editContact?.phone,
-      address: editContact?.address,
-      id: editContact?.id,
-    }));
+    setFormData(
+      (prevFormData: {
+        name: string;
+        email: string;
+        phone: string;
+        address: string;
+        id?: string | number;
+      }) => ({
+        ...prevFormData,
+        name: editContact?.name || prevFormData.name,
+        email: editContact?.email || prevFormData.email,
+        phone: editContact?.phone || prevFormData.phone,
+        address: editContact?.address || prevFormData.address,
+        id: editContact?.id || prevFormData.id,
+      })
+    );
     setVisible(true);
   };
 

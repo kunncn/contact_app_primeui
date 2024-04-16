@@ -38,7 +38,7 @@ const LoginPage = () => {
         nav("/");
       }, 2000);
     }
-  }, [status, nav]);
+  }, [status, nav, errorToastHandler, successToastHandler]);
 
   const formik = useFormik({
     validateOnBlur: true,

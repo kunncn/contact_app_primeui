@@ -6,7 +6,7 @@ type Props = {
 };
 
 const ToastComponent = ({ toast }: Props) => {
-  return <Toast ref={toast} position="top-center" />;
+  return <Toast className="capitalize" ref={toast} position="top-center" />;
 };
 
 export default ToastComponent;

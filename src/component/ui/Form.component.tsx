@@ -7,7 +7,7 @@ import {
   useUpdateContactMutation,
 } from "../../service/contact/endpoint/contact.endpoint";
 import { useToastHook } from "../../hook";
-import { useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -23,7 +23,19 @@ const validationSchema = Yup.object().shape({
   address: Yup.string(),
 });
 
-const FormComponent = ({ setVisible, formData }) => {
+const FormComponent = ({
+  setVisible,
+  formData,
+}: {
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  formData: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    id?: number;
+  };
+}) => {
   const { errorToast, successToast, errorToastHandler, successToastHandler } =
     useToastHook();
   const [createContactMutate, createContactStatus] = useCreateContactMutation();
@@ -125,8 +137,8 @@ const FormComponent = ({ setVisible, formData }) => {
               ? "Updating"
               : "Update"
             : formik.isSubmitting
-            ? "Submitting"
-            : "Submit"}
+            ? "Creating"
+            : "Create"}
         </Button>
       </form>
     </>

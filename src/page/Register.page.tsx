@@ -36,7 +36,7 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (status.isError) {
-      errorToastHandler({ message: status?.error?.data?.message });
+      errorToastHandler({ message: status?.error?.data?.message ?? "" });
     } else if (status.isSuccess) {
       successToastHandler(status?.data?.message);
       setTimeout(() => {
