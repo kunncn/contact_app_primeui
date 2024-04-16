@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RedirectFunction } from "../component/function/index";
 import { useNavigate } from "react-router-dom";
 import {
@@ -15,6 +15,13 @@ const HomePage = () => {
   const nav = useNavigate();
   const contactStatus = useGetContactsQuery();
   const contactLists = contactStatus?.data?.contacts?.data;
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+  const [visible, setVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (localStorage.getItem("logout") === "true") {
@@ -35,9 +42,19 @@ const HomePage = () => {
         )}
         {!contactStatus.isLoading && !contactStatus.isError && (
           <>
-            <SideBarComponent />
+            <SideBarComponent
+              setFormData={setFormData}
+              visible={visible}
+              setVisible={setVisible}
+              formData={formData}
+            />
             {contactLists.length ? (
-              <ContactComponent contactLists={contactLists} />
+              <ContactComponent
+                setVisible={setVisible}
+                formData={formData}
+                setFormData={setFormData}
+                contactLists={contactLists}
+              />
             ) : (
               <NoContactListComponent />
             )}

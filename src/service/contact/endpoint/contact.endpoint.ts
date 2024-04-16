@@ -24,6 +24,14 @@ const contactEndPoint = contactApi.injectEndpoints({
       }),
       invalidatesTags: ["contacts"],
     }),
+    updateContact: build.mutation({
+      query: (data) => ({
+        url: "contact/" + data.id.toString(),
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["contacts"],
+    }),
   }),
   overrideExisting: false,
 });
@@ -32,4 +40,5 @@ export const {
   useGetContactsQuery,
   useCreateContactMutation,
   useDeleteContactMutation,
+  useUpdateContactMutation,
 } = contactEndPoint;

@@ -19,14 +19,32 @@ type Props = {
   user_id: string;
 };
 
-const ContactComponent = ({ contactLists }: { contactLists: Props[] }) => {
+const ContactComponent = ({
+  setVisible,
+  contactLists,
+  setFormData,
+  formData,
+}: {
+  contactLists: Props[];
+}) => {
   const { successToast, successToastHandler } = useToastHook();
   const [deleteContactMutate, deleteContactStatus] = useDeleteContactMutation();
   const [deletingContactId, setDeletingContactId] = useState<number | null>(
     null
   );
 
-  const handleEdit = (id: number) => {};
+  const handleEdit = async (id: number) => {
+    const editContact = contactLists.find((contact) => contact.id === id);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      name: editContact?.name,
+      email: editContact?.email,
+      phone: editContact?.phone,
+      address: editContact?.address,
+      id: editContact?.id,
+    }));
+    setVisible(true);
+  };
 
   const handleDelete = async (id: number) => {
     setDeletingContactId(id);

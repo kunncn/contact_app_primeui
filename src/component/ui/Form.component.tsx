@@ -2,8 +2,12 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { InputComponent, ToastComponent } from "../../component/ui/";
 import { Button } from "primereact/button";
-import { useCreateContactMutation } from "../../service/contact/endpoint/contact.endpoint";
+import {
+  useCreateContactMutation,
+  useUpdateContactMutation,
+} from "../../service/contact/endpoint/contact.endpoint";
 import { useToastHook } from "../../hook";
+import { useEffect } from "react";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -23,27 +27,51 @@ const FormComponent = ({ setVisible, formData }) => {
   const { errorToast, successToast, errorToastHandler, successToastHandler } =
     useToastHook();
   const [createContactMutate, createContactStatus] = useCreateContactMutation();
+  const [updateContactMutate, updateContactStatus] = useUpdateContactMutation();
+
+  useEffect(() => {
+    if (createContactStatus?.data?.success) {
+      successToastHandler({
+        message: createContactStatus?.data?.message,
+      });
+      setTimeout(() => {
+        setVisible(false);
+      }, 1000);
+    } else if (updateContactStatus?.data?.success) {
+      successToastHandler({
+        message: updateContactStatus?.data?.message,
+      });
+      setTimeout(() => {
+        setVisible(false);
+      }, 1000);
+    } else if (createContactStatus?.data?.success === false) {
+      errorToastHandler({
+        message: createContactStatus?.data?.message,
+      });
+    } else if (updateContactStatus?.data?.success === false) {
+      errorToastHandler({
+        message: updateContactStatus?.data?.message,
+      });
+    }
+  }, [createContactStatus?.data?.success, updateContactStatus?.data?.success]);
+
+  console.log(updateContactStatus);
 
   const formik = useFormik({
     validateOnBlur: true,
     validateOnChange: true,
     initialValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
+      name: formData?.name || "",
+      email: formData?.email || "",
+      phone: formData?.phone || "",
+      address: formData?.address || "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      try {
+      if (formData.id && formData.name && formData.phone) {
+        await updateContactMutate({ ...values, id: formData.id });
+      } else {
         await createContactMutate(values);
-        setTimeout(() => {
-          setVisible(false);
-        }, 1000);
-        successToastHandler({ message: createContactStatus?.data?.message });
-      } catch (error) {
-        console.log(error);
-        errorToastHandler({ message: createContactStatus?.data?.message });
       }
     },
   });
@@ -51,7 +79,12 @@ const FormComponent = ({ setVisible, formData }) => {
   return (
     <>
       <ToastComponent
-        toast={!createContactStatus?.data?.success ? successToast : errorToast}
+        toast={
+          createContactStatus?.data?.success ||
+          updateContactStatus?.data?.success
+            ? successToast
+            : errorToast
+        }
       />
       <form onSubmit={formik.handleSubmit}>
         {[
@@ -87,7 +120,13 @@ const FormComponent = ({ setVisible, formData }) => {
               className="pi pi-spin pi-spinner text-[15px] me-2"
             ></i>
           )}
-          {formik.isSubmitting ? "Submitting" : "Submit"}
+          {formData?.name && formData?.phone
+            ? formik.isSubmitting
+              ? "Updating"
+              : "Update"
+            : formik.isSubmitting
+            ? "Submitting"
+            : "Submit"}
         </Button>
       </form>
     </>
